@@ -18,18 +18,20 @@
           <h3 class="filter-title">
             {{ t('modrinth.modpackSource.source') }}
           </h3>
-          <div class="flex gap-2">
+          <div class="grid grid-cols-3 gap-2" data-testid="store-source-filters">
             <button
               v-for="source in sourcesList"
               :key="source.id"
               type="button"
               :aria-label="source.text"
-              :aria-pressed="!omitSources.includes(source.id)"
-              class="source-button surface-card-row rounded-xl relative flex-1 flex flex-col items-center justify-center p-3"
-              :class="{ omitted: omitSources.includes(source.id) }"
+              :aria-pressed="selectedSources.includes(source.id)"
+              :data-testid="isCommunitySource(source.id) ? `community-source-${source.id}` : `store-source-${source.id}`"
+              class="source-button surface-card-row rounded-xl relative flex-1 flex flex-col items-center justify-center p-2"
+              :class="{ omitted: !selectedSources.includes(source.id) }"
               @click="toggleSource(source.id)"
             >
-              <component :is="source.component" class="w-6 h-6 fill-current" />
+              <component v-if="source.component" :is="source.component" class="w-6 h-6 fill-current" />
+              <v-icon v-else size="24">{{ source.icon }}</v-icon>
               <span class="text-xs font-bold mt-2">{{ source.text }}</span>
               <div
                 class="cross-overlay absolute inset-0 flex items-center justify-center rounded-xl transition-opacity duration-200"
@@ -40,6 +42,7 @@
           </div>
         </div>
 
+        <MossChineseCommunity />
         <div>
           <!-- Sort -->
           <div class="filter-group">
@@ -47,7 +50,7 @@
             <v-select
               v-model="sort"
               :items="sortBy"
-              :disabled="sources.length === 0 || (sources.length === 1 && sources[0] === 'ftb')"
+              :disabled="selectedSources.length === 0 || (communitySources.length > 0 && !!keyword) || (selectedSources.length === 1 && ['ftb', 'mcbbs'].includes(selectedSources[0]))"
               :aria-label="t('modrinth.sort.title')"
               item-title="text"
               item-value="value"
@@ -94,6 +97,7 @@
       />
       <!-- Modrinth Categories -->
       <FilterCard
+        v-if="!communitySources.length"
         :title="`${t('curseforge.category')} (Modrinth)`"
         :items="modrinthCategoriesDisplay"
         :selected="_modrinthCategories"
@@ -103,6 +107,7 @@
       />
       <!-- CurseForge Categories -->
       <FilterCard
+        v-if="!communitySources.length"
         :title="`${t('curseforge.category')} (CurseForge)`"
         :items="curseforgeCategoriesDisplay"
         :selected="curseforgeCategory ? [curseforgeCategory.toString()] : []"
@@ -130,7 +135,7 @@
             hide-details
             rounded="xl"
             density="comfortable"
-            :placeholder="t('store.searchHint')"
+            :placeholder="communitySources.length ? t('moss.community.searchHint') : t('store.searchHint')"
             prepend-inner-icon="search"
             class="elevated-search"
           >
@@ -145,8 +150,14 @@
 
       <!-- Main Content -->
       <div id="store-content" class="p-6 lg:(flex-1 overflow-y-auto p-10) custom-scrollbar relative" ref="container">
+        <div v-if="communitySources.length" class="mb-4">
+          <p class="text-xs mb-3">{{ t('moss.community.mixedHint') }}</p>
+          <v-btn variant="text" size="small" prepend-icon="refresh" @click="communityResults.refresh">{{ t('shared.refresh') }}</v-btn>
+          <v-alert v-for="source in communityErrors" :key="source" type="warning" variant="tonal" density="compact" class="mb-2">{{ communityNames[source] }}: {{ t('moss.community.loadError') }}</v-alert>
+          <v-alert v-if="communityPartial.length" type="info" variant="tonal" density="compact">{{ t('moss.community.partial') }}</v-alert>
+        </div>
         <!-- Featured Carousel -->
-        <div v-if="!keyword && selectedCount === 0" class="mb-12">
+        <div v-if="!keyword && selectedCount === 0 && !communitySources.length && selectedSources.length" class="mb-12">
           <h2 class="text-2xl font-bold mb-6 flex items-center gap-3">
             <v-icon color="orange" size="large">local_fire_department</v-icon>
             {{ t('store.trending') }}
@@ -184,7 +195,7 @@
 
         <!-- Latest Minecraft Section -->
         <section
-          v-if="!keyword && selectedCount === 0"
+          v-if="!keyword && selectedCount === 0 && !communitySources.length && selectedSources.length"
           class="mb-12"
           role="region"
           :aria-labelledby="latestMinecraftHeadingId"
@@ -221,9 +232,9 @@
 
         <!-- Grid -->
         <section class="min-h-screen" role="region" :aria-labelledby="discoverHeadingId">
-          <div class="flex items-end justify-between mb-6 gap-2">
+          <div class="flex flex-wrap items-end justify-between mb-6 gap-3">
             <div>
-              <h2 :id="discoverHeadingId" class="text-2xl mb-3 font-bold text-gray-900 dark:text-white flex items-center gap-3">
+              <h2 :id="discoverHeadingId" class="text-2xl mb-3 font-bold text-gray-900 dark:text-white flex items-center gap-3 whitespace-nowrap">
                 <v-icon color="primary" size="large" aria-hidden="true">{{ hasFilters ? 'search' : 'explore' }}</v-icon>
                 {{ hasFilters ? t('store.searchResult') : t('store.discover') }}
               </h2>
@@ -258,7 +269,7 @@
             </div>
           </div>
           <div
-            v-if="items.length === 0"
+            v-if="items.length === 0 && !isSearching"
             class="flex flex-col justify-center items-center h-96 text-center opacity-50"
           >
             <v-icon size="96" color="grey">mood_bad</v-icon>
@@ -270,7 +281,7 @@
             v-roving-tabindex
             role="group"
             :aria-labelledby="discoverHeadingId"
-            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6 pb-20"
+            class="store-project-grid gap-6 pb-20"
           >
             <StoreExploreCardModern
               v-for="mod in items"
@@ -290,7 +301,7 @@
               :length="pageCount"
               active-color="primary"
               :disabled="isSearching"
-              :total-visible="12"
+              :total-visible="6"
               rounded="circle"
               density="comfortable"
             />
@@ -303,6 +314,11 @@
 
 <script lang="ts" setup>
 import CurseforgeIcon from '@/components/CurseforgeIcon.vue'
+import MossChineseCommunity from '@/components/MossChineseCommunity.vue'
+import { communityNames, isCommunitySource } from '@/util/communityCatalog'
+import { allStoreSources, selectedStoreSources, toggleStoreSource, interleaveStoreGroups, type UnifiedStoreSource } from '@/util/storeSources'
+import { useCommunitySearch } from '@/composables/communitySearch'
+import type { ExploreProjectModern } from '@/components/StoreExploreCardModern.vue'
 import FilterCard from '@/components/FilterCard.vue'
 import FTBIcon from '@/components/FTBIcon.vue'
 import ModrinthIcon from '@/components/ModrinthIcon.vue'
@@ -342,11 +358,15 @@ function ensureQuery(query: Record<string, string | (string | null)[] | null | u
 }
 
 const query = useQuery('query', ensureQuery)
+const community = useQuery('community', ensureQuery)
+const selectedSources = computed(() => selectedStoreSources(omitSources.value, community.value))
+const communitySources = computed(() => selectedSources.value.filter(isCommunitySource))
+const nativeOmitSources = computed(() => allStoreSources.filter(s => !selectedSources.value.includes(s)))
 const gameVersion = useQuery('gameVersion', ensureQuery)
 const modLoaders = useQueryStringArray('modLoaders', ensureQuery)
 const sortQuery = useQuery('sort', ensureQuery)
 const sort = computed({
-  get: () => normalizeMarketSort(sortQuery.value || (query.value ? 'relevance' : 'downloads')),
+  get: () => normalizeMarketSort(sortQuery.value || (query.value || communitySources.value.length ? 'relevance' : 'downloads')),
   set: (value: string) => { sortQuery.value = value },
 })
 const page = useQueryNumber('page', 1)
@@ -365,17 +385,32 @@ const tCategory = useCurseforgeCategoryI18n()
 const { getDateString } = useDateString()
 const galleryMappings = ref<Record<string, { name: string; description: string }>>({})
 
-const { items, isSearching, searchError, pageCount, sources } = useSearchedItems({
+const { items: nativeItems, isSearching: nativeSearching, searchError, pageCount: nativePageCount, sources } = useSearchedItems({
   query,
   gameVersion,
   modLoaders,
   sort,
   page,
-  omitSources,
+  omitSources: nativeOmitSources,
   modrinthCategories: _modrinthCategories,
   curseforgeCategory,
   pageSize,
   tCategory,
+})
+const communityResults = useCommunitySearch(communitySources, () => ({ query: query.value, version: gameVersion.value, loaders: modLoaders.value, sort: sort.value, page: page.value }))
+const { errors: communityErrors, partial: communityPartial } = communityResults
+const isSearching = computed(() => (sources.value.length > 0 && nativeSearching.value) || communityResults.loading.value)
+const pageCount = computed(() => Math.max(sources.value.length ? nativePageCount.value : 1, communityResults.pages.value))
+const items = computed<ExploreProjectModern[]>(() => {
+  const groups: ExploreProjectModern[][] = [sources.value.length ? nativeItems.value : []]
+  for (const source of communitySources.value) {
+    groups.push((communityResults.states.value[source]?.items ?? []).map(item => ({
+      id: item.url, type: source, originalUrl: item.url, title: item.title,
+      description: item.description || t('moss.community.noDescription'), iconUrl: item.image,
+      author: item.author, downloadCount: '', updatedAt: '',
+    })))
+  }
+  return interleaveStoreGroups(groups)
 })
 
 // Gamepad triggers (L2/R2) turn store result pages.
@@ -416,7 +451,7 @@ const refreshRecentMinecraft = () => {
 
 // Search Logic
 const sortByItems = useSortByItems()
-const sortBy = computed(() => sortByItems.value.map(item => ({
+const sortBy = computed(() => sortByItems.value.filter(item => !communitySources.value.length || ['relevance', 'updated', 'newest'].includes(item.value)).map(item => ({
   ...item,
   text: item.value === 'follows' ? t('store.popularity') : item.text,
 })))
@@ -433,26 +468,29 @@ const {
 } = injection(kModrinthTags)
 const { categories: curseforgeCategories } = injection(kCurseforgeCategories)
 const catModLoaders = computed(() =>
-  modrinthModloaders.value.filter((v) => v.supported_project_types.includes('modpack')),
+  modrinthModloaders.value.filter((v) => communitySources.value.length ? ['forge', 'fabric', 'quilt', 'neoforge'].includes(v.name) : v.supported_project_types.includes('modpack')),
 )
 
 const enter = (type: string, id: string) => {
+  if (isCommunitySource(type)) { window.open(id, 'browser'); return }
   push(`/store/${type}/${id}`)
 }
 
 // --- UI Logic for Filters ---
-const sourcesList = [
+const sourcesList = computed(() => [
   { id: 'modrinth', text: 'Modrinth', component: ModrinthIcon },
   { id: 'curseforge', text: 'CurseForge', component: CurseforgeIcon },
   { id: 'ftb', text: 'FTB', component: FTBIcon },
-]
+  { id: 'mcmod-mod', text: t('moss.community.sourceMods'), icon: 'menu_book', component: undefined },
+  { id: 'mcmod-pack', text: t('moss.community.sourcePacks'), icon: 'inventory_2', component: undefined },
+  { id: 'mcbbs', text: 'MCBBS 2nd', icon: 'forum', component: undefined },
+] as { id: UnifiedStoreSource; text: string; component?: typeof ModrinthIcon; icon?: string }[])
 
 function toggleSource(id: string) {
-  if (omitSources.value.includes(id)) {
-    omitSources.value = omitSources.value.filter((s) => s !== id)
-  } else {
-    omitSources.value = [...omitSources.value, id]
-  }
+  if (!allStoreSources.includes(id as UnifiedStoreSource)) return
+  replace({ query: { ...route.query, community: undefined,
+    omitSources: toggleStoreSource(omitSources.value, id as UnifiedStoreSource, community.value).join(','),
+    ...(isCommunitySource(id) ? { modrinthCategories: undefined, curseforgeCategory: undefined } : {}), page: '1' } })
 }
 
 // Categories Display
@@ -511,7 +549,7 @@ const activeTags = computed(() => {
   }[] = []
 
   omitSources.value.forEach((s) =>
-    tags.push({ id: s, text: sourcesList.find((x) => x.id === s)?.text || s, type: 'source' }),
+    tags.push({ id: s, text: sourcesList.value.find((x) => x.id === s)?.text || s, type: 'source' }),
   )
   if (gameVersion.value)
     tags.push({ id: gameVersion.value, text: gameVersion.value, type: 'version' })
@@ -565,6 +603,7 @@ function clearAllFilters() {
     query: {
       ...route.query,
       omitSources: undefined,
+      community: undefined,
       gameVersion: undefined,
       modLoaders: undefined,
       modrinthCategories: undefined,
@@ -683,8 +722,11 @@ useTutorial(
    shared `.surface-card-row` utility. Only the colour-tone bits and
    the omitted (off) override live here. */
 .source-button {
+  min-height: 5.25rem;
   @apply text-gray-600 dark:text-gray-400;
 }
+.source-button > span { font-size: .6875rem; line-height: 1.3; }
+.store-project-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(220px, 100%), 1fr)); }
 
 .source-button .cross-overlay {
   opacity: 0;

@@ -2,6 +2,7 @@
   <div
     ref="el"
     data-testid="store-project-card"
+    :data-source="value.type"
     class="explore-card surface-card-clickable group relative overflow-hidden flex flex-col h-full"
     role="button"
     tabindex="0"
@@ -14,11 +15,14 @@
     <div class="explore-card__media aspect-[16/9] relative overflow-hidden">
       <transition name="fade-transition" mode="out-in">
         <img
+          v-if="imgSrc"
           :key="imgSrc"
           :src="imgSrc"
           class="explore-card__img w-full h-full object-cover"
           loading="lazy"
+          alt=""
         />
+        <v-icon v-else class="absolute inset-0 m-auto" size="48" color="primary">{{ value.type === 'mcmod-mod' ? 'extension' : 'inventory_2' }}</v-icon>
       </transition>
 
       <!-- Gradient overlay -->
@@ -57,9 +61,12 @@
       <!-- Header row: floating avatar + title/author inline -->
       <div class="flex items-center gap-3">
         <img
+          v-if="value.iconUrl"
           :src="value.iconUrl"
           class="explore-card__avatar w-12 h-12 rounded-xl object-cover bg-surface-variant shrink-0"
+          alt=""
         />
+        <v-icon v-else size="32" color="primary">{{ value.type === 'mcmod-mod' ? 'extension' : 'inventory_2' }}</v-icon>
         <div class="overflow-hidden min-w-0 flex-1">
           <h3
             v-shared-tooltip="value.localizedTitle || value.title"
@@ -86,6 +93,7 @@
 
       <!-- Stats row -->
       <div
+        v-if="!value.originalUrl"
         class="explore-card__stats mt-auto pt-2.5 flex items-center justify-between gap-2 text-[11px] text-gray-600 dark:text-gray-400"
       >
         <div
@@ -100,6 +108,7 @@
           {{ value.updatedAt }}
         </div>
       </div>
+      <div v-else class="mt-auto flex items-center gap-2 text-primary text-xs">{{ t('moss.community.original') }}<v-icon size="16">open_in_new</v-icon></div>
     </div>
   </div>
 </template>
@@ -107,6 +116,7 @@
 <script setup lang="ts">
 import { vSharedTooltip } from '@/directives/sharedTooltip'
 import { useElementHover, useInterval } from '@vueuse/core'
+import { communityNames, isCommunitySource, type CommunitySource } from '@/util/communityCatalog'
 
 const props = defineProps<{ value: ExploreProjectModern }>()
 
@@ -167,7 +177,7 @@ const sourceLabel = computed(() => {
     case 'ftb':
       return 'FTB'
     default:
-      return props.value.type
+      return isCommunitySource(props.value.type) ? communityNames[props.value.type] : props.value.type
   }
 })
 
@@ -177,7 +187,8 @@ const sourceBadgeClass = computed(() => {
 
 export interface ExploreProjectModern {
   id: string
-  type: 'modrinth' | 'curseforge' | 'ftb'
+  type: 'modrinth' | 'curseforge' | 'ftb' | CommunitySource
+  originalUrl?: string
   title: string
   iconUrl: string
   description: string
