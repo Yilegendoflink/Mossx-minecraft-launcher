@@ -132,15 +132,13 @@
     v-else
     class="flex h-full w-full items-center justify-center"
   >
-    <v-img
-      class="max-w-50"
-      src="http://launcher/icons/logoDark"
-    />
+    <MossLogo :size="64" />
   </v-card>
 </template>
 
 <script lang="ts" setup>
 import AppMoodBackground from '@/components/AppMoodBackground.vue'
+import MossLogo from '@/components/MossLogo.vue'
 import AppMoodSurface from '@/components/AppMoodSurface.vue'
 import { useService } from '@/composables'
 import { kSettingsState } from '@/composables/setting'

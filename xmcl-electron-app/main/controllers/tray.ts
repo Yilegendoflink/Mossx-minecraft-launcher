@@ -156,10 +156,10 @@ export const trayPlugin: ControllerPlugin = function (this: ElectronController) 
     })
     this.app.registry.get(kSettings).then(state => {
       state.subscribe('config', () => {
-        tray.setToolTip(t('title'))
+        tray.setToolTip('MOSS X')
         tray.setContextMenu(createMenu())
       }).subscribe('localeSet', () => {
-        tray.setToolTip(t('title'))
+        tray.setToolTip('MOSS X')
         tray.setContextMenu(createMenu())
       })
     })
@@ -181,7 +181,7 @@ export const trayPlugin: ControllerPlugin = function (this: ElectronController) 
       })
     }
 
-    tray.setToolTip(t('title'))
+    tray.setToolTip('MOSS X')
     tray.setContextMenu(createMenu())
 
     if (app.dock) {

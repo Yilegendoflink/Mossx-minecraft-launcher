@@ -1,8 +1,21 @@
 <template>
   <section class="about">
+    <SettingCard class="mb-4" title="MOSS X" data-testid="moss-about">
+      <template #header-action>
+        <MossLogo :size="40" data-testid="moss-about-icon" />
+      </template>
+      <div class="pa-4">
+        <p class="font-weight-medium mb-2">{{ t('moss.edition') }}</p>
+        <p class="text-body-2 mb-3">{{ t('moss.attribution') }}</p>
+        <a href="https://github.com/voxelum/x-minecraft-launcher" target="browser" rel="noopener noreferrer" class="text-primary underline">X Minecraft Launcher (XMCL)</a>
+        <span class="mx-2">·</span>
+        <a href="https://github.com/Yilegendoflink/Mossx-minecraft-launcher" target="browser" rel="noopener noreferrer" class="text-primary underline">MOSS X</a>
+      </div>
+    </SettingCard>
     <XmclAccountPanel class="mb-4" />
     <SettingCard>
       <div class="pa-4">
+        <p class="text-caption mb-4">{{ t('moss.upstreamInfo') }}</p>
         <!-- Logo & Header info -->
         <div class="d-flex align-center flex-wrap gap-4 mb-6">
           <v-img
@@ -220,6 +233,7 @@ import useSWRV from 'swrv'
 import { useId } from 'vue'
 import kofi from '../assets/kofi.webp'
 import logo from '../assets/logo.webp'
+import MossLogo from '@/components/MossLogo.vue'
 
 const env = injection(kEnvironment)
 const flights = injection(kFlights)
