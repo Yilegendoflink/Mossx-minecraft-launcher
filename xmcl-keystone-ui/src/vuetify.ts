@@ -94,15 +94,19 @@ export const vuetify = createVuetify({
     }
   },
   theme: {
-    defaultTheme: 'dark',
+    defaultTheme: 'light',
     themes: {
-      light: {},
+      light: { colors: { primary: '#254d3c', secondary: '#66756b', background: '#f6f8f5', surface: '#ffffff', 'on-surface': '#243b30', 'on-background': '#243b30' } },
       system: {},
       dark: {
         dark: true,
         colors: {
-          primary: '#4caf50',
-          accent: '#00e676',
+          primary: '#86b796',
+          accent: '#a3cfb0',
+          background: '#17251e',
+          surface: '#20362a',
+          'on-surface': '#edf3ed',
+          'on-background': '#edf3ed',
         },
       },
     },

@@ -1,4 +1,5 @@
 <template>
+    <MossBiomePicker :selected="theme.mossBiome" @select="selectMossBiome" />
     <SettingItemSelect
       v-model="darkModel"
       :title="t('setting.darkTheme')"
@@ -454,6 +455,8 @@
 import CustomCssEditor from '@/components/CustomCssEditor.vue'
 import SettingItem from '@/components/SettingItem.vue'
 import SettingItemCheckbox from '@/components/SettingItemCheckbox.vue'
+import MossBiomePicker from '@/components/MossBiomePicker.vue'
+import { applyMossBiome } from '@/util/mossBiomes'
 import SettingItemSelect from '@/components/SettingItemSelect.vue'
 import { useAgentChatOpen } from '@/composables/agentChat'
 import { kCustomCss } from '@/composables/customCss'
@@ -499,6 +502,10 @@ const defaultFontFolder = computed(() => {
 const emit = defineEmits<{
   (e: 'save'): void
 }>()
+function selectMossBiome(id: string) {
+  applyMossBiome(props.theme, id)
+  emit('save')
+}
 const {
   backgroundMusic,
   backgroundImage,
@@ -682,8 +689,7 @@ const backgroundImageFits = computed(() => [
 const backgroundTypes = computed(() => [
   { value: BackgroundType.NONE, text: t('setting.backgroundTypes.none') },
   { value: BackgroundType.IMAGE, text: t('setting.backgroundTypes.image') },
-  { value: BackgroundType.PARTICLE, text: t('setting.backgroundTypes.particle') },
-  { value: BackgroundType.HALO, text: t('setting.backgroundTypes.halo') },
+  { value: BackgroundType.MOSS, text: t('moss.motionBackground') },
   { value: BackgroundType.VIDEO, text: t('setting.backgroundTypes.video') },
 ])
 function selectImage() {

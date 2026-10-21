@@ -4,13 +4,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>X Minecraft Launcher</title>
+    <title>MOSS X</title>
+    <link rel="icon" type="image/svg+xml" href="./assets/moss-x.svg">
     <link rel="stylesheet" href="./assets/google.font.css">
     <link rel="stylesheet" href="./assets/preload.css">
     <script src="http://launcher/flights"></script>
+    <script>
+        try {
+            const palette = JSON.parse(localStorage.getItem('moss_boot_palette') || 'null');
+            if (palette && typeof palette.color === 'string' && CSS.supports('color', palette.color)) {
+                document.documentElement.style.setProperty('--moss-boot-color', palette.color);
+                const background = typeof palette.background === 'string' && CSS.supports('color', palette.background)
+                    ? palette.background : palette.dark ? '#17251e' : '#f6f8f5';
+                document.documentElement.style.setProperty('--moss-boot-bg', background);
+            }
+        } catch (_) {}
+    </script>
     <style>
         .unloaded {
-            background-color: rgb(18, 18, 18);
+            margin: 0;
+            background-color: var(--moss-boot-bg, #f6f8f5);
+            color: var(--moss-boot-color, #254d3c);
             height: 100vh;
             width: 100vw;
             min-width: 100vw;
@@ -18,24 +32,28 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
             overflow: hidden;
         }
-        @keyframes pulse {
-            0%,
-            100% {
-                opacity: 1;
-            }
-            50% {
-                opacity: 0.5;
-            }
-        }
+        .moss-boot { display: flex; flex-direction: column; align-items: center; gap: 14px; font-family: 'Segoe UI', 'Microsoft YaHei UI', sans-serif; }
+        .moss-boot h1 { margin: 0; font-size: 22px; letter-spacing: .05em; }
+        .moss-boot__logo { width: 64px; height: 64px; background: currentColor; mask: url('./assets/moss-x.svg') center / contain no-repeat; }
+        .moss-boot p { margin: 0; font-size: 12px; opacity: .7; }
+        .moss-boot__progress { width: 96px; height: 3px; margin-top: 8px; border-radius: 3px; background: color-mix(in srgb, currentColor 15%, transparent); overflow: hidden; }
+        .moss-boot__progress::after { content: ''; display: block; width: 40%; height: 100%; background: currentColor; animation: moss-boot-slide 1.3s ease-in-out infinite alternate; }
+        @keyframes moss-boot-slide { to { transform: translateX(150%); } }
+        @media (prefers-color-scheme: dark) { .unloaded { background: var(--moss-boot-bg, #17251e); color: var(--moss-boot-color, #d4e3d3); } }
+        @media (prefers-reduced-motion: reduce) { .moss-boot__progress::after { animation: none; } }
     </style>
 </head>
 
 <body class="overflow-hidden unloaded">
     <div id="app">
-        <img src="./assets/logo.webp" alt="Logo">
+        <div class="moss-boot" role="status" aria-live="polite" data-testid="moss-loading">
+            <span class="moss-boot__logo" role="img" aria-label="MOSS X" data-testid="moss-loading-icon"></span>
+            <h1>MOSS X</h1>
+            <p>X-Launcher个人美化版本</p>
+            <span class="moss-boot__progress" aria-hidden="true"></span>
+        </div>
     </div>
     <script type="module" src="./windows/main/index.ts"></script>
 </body>

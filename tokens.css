@@ -1,0 +1,24 @@
+/* Hallmark · macrostructure: Workbench · tone: utilitarian · anchor hue: forest green */
+:root {
+  --moss-font-display: 'Bahnschrift', 'Trebuchet MS', 'Microsoft YaHei UI', sans-serif;
+  --moss-font-body: 'custom', 'Microsoft YaHei UI', 'PingFang SC', 'Segoe UI', sans-serif;
+  --moss-canvas: var(--color-bg, #f6f8f5);
+  --moss-sidebar: var(--color-sidebar-bg, #eaf0e8);
+  --moss-card: rgb(var(--v-theme-surface, 255, 255, 255));
+  --moss-ink: rgb(var(--v-theme-on-surface, 36, 59, 48));
+  --moss-muted: var(--color-secondary-text, #66756b);
+  --moss-primary: var(--color-primary, #254d3c);
+  --moss-selected: color-mix(in srgb, var(--moss-primary) 12%, var(--moss-sidebar));
+  --moss-border: rgba(var(--v-theme-on-surface, 36, 59, 48), .12);
+  --moss-focus: #3982c7;
+  --moss-space-xs: .25rem;
+  --moss-space-sm: .5rem;
+  --moss-space-md: 1rem;
+  --moss-space-lg: 1.5rem;
+  --moss-space-xl: 2rem;
+  --moss-radius-control: var(--surface-menu-item-radius, .5rem);
+  --moss-radius-card: var(--card-radius, .75rem);
+  --moss-sidebar-width: 13.75rem;
+  --moss-ease-out: cubic-bezier(.16, 1, .3, 1);
+  --moss-duration: 150ms;
+}

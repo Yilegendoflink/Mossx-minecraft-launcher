@@ -1,0 +1,87 @@
+/* Hallmark · genre: modern-minimal · macrostructure: Workbench · design-system: design.md · designed-as-app */
+/* Hallmark · pre-emit critique: P4 H4 E4 S5 R4 V4 */
+@import '../../../tokens.css';
+
+.moss-app, .moss-app.v-application { font-family: var(--moss-font-body); color: var(--moss-ink); }
+.moss-window-title { flex-shrink: 0; padding-inline: .375rem; font-size: .75rem; font-weight: 650; color: var(--moss-muted); }
+.moss-app.v-application .app-layout { padding: 0 !important; gap: 0 !important; }
+.moss-app.v-application .header-overlay { opacity: 0; pointer-events: none; }
+.moss-app.v-application .moss-main-content { min-width: 0; background: transparent; }
+.moss-app.v-application .v-system-bar { min-height: 2.625rem; max-height: 2.625rem !important; height: 2.625rem; border-bottom: 1px solid var(--moss-border); background: var(--moss-canvas) !important; color: var(--moss-muted); backdrop-filter: none !important; }
+.moss-app.v-application .system-btn { min-width: 2.75rem; min-height: 2.625rem; }
+.moss-app.v-application .system-bar-badge { border-radius: var(--moss-radius-control); }
+.moss-app.v-application .sidebar { width: var(--moss-sidebar-width); min-width: var(--moss-sidebar-width); flex-shrink: 0; border-radius: 0; border-inline-end: 1px solid var(--moss-border); padding: .5rem .75rem .75rem; background: var(--moss-sidebar); backdrop-filter: none !important; }
+.moss-app.v-application .sidebar__section { align-items: stretch; padding: 0; }
+.moss-app.v-application .sidebar__divider { background: var(--moss-border); margin: .75rem .5rem; height: 1px; }
+.moss-app.v-application .sidebar-back-btn { align-self: flex-start; width: 2rem; height: 1.75rem; margin: 0 .5rem .5rem; color: var(--moss-muted); }
+.moss-app.v-application .sidebar-back-btn:hover { background: var(--moss-selected); }
+.moss-app.v-application .moss-nav-caption { display: block; padding: .375rem .75rem .5rem; color: var(--moss-muted); font-size: .625rem; letter-spacing: .04em; }
+.moss-app.v-application .sidebar > .sidebar__section > .sidebar-item { display: flex; align-items: center; width: 100%; height: 2.75rem; margin: .125rem 0; gap: .625rem; padding: .375rem .625rem; border-radius: var(--moss-radius-control); font-size: .8125rem; }
+.moss-app.v-application .sidebar > .sidebar__section > .sidebar-item .sidebar-item__content { width: 1.625rem; height: 1.625rem; border-radius: .375rem; background: transparent; color: inherit; flex-shrink: 0; }
+.moss-app.v-application .sidebar > .sidebar__section > .sidebar-item .sidebar-item__icon { font-size: 1.25rem !important; width: 1.25rem; height: 1.25rem; }
+.moss-app.v-application .sidebar > .sidebar__section > .sidebar-item:hover { background: var(--moss-selected); }
+.moss-app.v-application .sidebar > .sidebar__section > .sidebar-item.router-link-active, .moss-app.v-application .sidebar > .sidebar__section > .sidebar-item--active { background: var(--moss-selected); color: var(--moss-primary); font-weight: 600; }
+.moss-app.v-application .sidebar > .sidebar__section > .sidebar-item .sidebar-item__indicator { display: none; }
+.moss-nav-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.moss-app.v-application .sidebar__instances { padding: .25rem 0; }
+.moss-app.v-application .sidebar-instance-wrapper { display: flex; align-items: center; }
+.moss-app.v-application .moss-instance-name { flex: 1; min-width: 0; font-size: .75rem; padding-inline-start: .5rem; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; pointer-events: none; }
+.moss-app.v-application .sidebar-instance { width: 100%; height: 2.75rem; margin: .125rem 0; padding: .375rem .625rem; display: flex; align-items: center; border-radius: var(--moss-radius-control); }
+.moss-app.v-application .sidebar-instance__content, .moss-app.v-application .sidebar-instance__image { width: 1.75rem !important; height: 1.75rem !important; min-width: 1.75rem; border-radius: .375rem; }
+.moss-app.v-application .sidebar-instance__indicator { display: none; }
+.moss-app.v-application .sidebar-instance--active { background: var(--moss-selected); color: var(--moss-primary); }
+.moss-app.v-application .sidebar-instance:hover { background: var(--moss-selected); }
+.moss-app.v-application .sidebar-instances__skeleton { display: none; }
+.moss-app.v-application .sidebar-instances .add-instance-button { margin: .5rem auto; }
+.moss-app.v-application .home-page > .header { padding-top: 1.5rem; background: var(--moss-canvas); }
+.moss-app.v-application .home-page > .header::before { background: none; backdrop-filter: none; }
+.moss-app.v-application .home-title { font-family: var(--moss-font-display); font-size: 1.75rem !important; font-weight: 650; letter-spacing: -.025em; }
+.moss-app.v-application .home-page .header-primary-row { padding-inline: 1.5rem; }
+.moss-app.v-application .surface-card, .moss-app.v-application .surface-card-subsection, .moss-app.v-application .surface-card-prominent { border: 1px solid var(--moss-border); box-shadow: none; }
+.moss-app.v-application .v-btn:not(.v-btn--icon) { text-transform: none; letter-spacing: normal; }
+.moss-app.v-application .v-field { border-radius: var(--moss-radius-control); box-shadow: none !important; }
+.moss-app.v-application .v-field--variant-solo { border: 1px solid var(--moss-border); }
+.moss-app.v-application .v-btn:focus-visible, .moss-app.v-application a:focus-visible, .moss-app.v-application button:focus-visible { outline: 2px solid var(--moss-focus); outline-offset: 2px; }
+.moss-app.v-application .btn-launch { border-radius: var(--moss-radius-control) !important; font-size: 1rem !important; box-shadow: none; }
+.moss-app.v-application .btn-launch:is(.bg-info, .bg-blue) { background: var(--moss-primary) !important; color: rgb(var(--v-theme-on-primary)) !important; }
+.moss-app.v-application .launch-pill:has(.btn-launch:is(.bg-info, .bg-blue)) .btn-play-inset, .moss-app.v-application .launch-pill:has(.btn-launch:is(.bg-info, .bg-blue)) .btn-menu-inset { background: color-mix(in srgb, var(--moss-primary) 78%, var(--moss-card)) !important; color: rgb(var(--v-theme-on-primary)) !important; }
+.moss-app.v-application .launch-pill { border-radius: var(--moss-radius-control); }
+.moss-app.v-application .my-stuff-page .section-title { font-family: var(--moss-font-display); font-size: 1.125rem; letter-spacing: normal; }
+.moss-app.v-application .store-search-bar, .moss-app.v-application .sticky-tabs-wrapper { background: var(--moss-canvas); backdrop-filter: none; }
+.moss-app.v-application .store-sidebar { background: var(--moss-card); }
+.moss-app.v-application .setting-sidebar { padding-inline: 1rem .5rem; }
+.moss-app.v-application .workspace-side-panel { background: var(--moss-card); border-inline-end: 1px solid var(--moss-border); }
+.moss-app.v-application .me-layout .classic-container { padding-top: 1.5rem; }
+.moss-app.v-application .setting-page .content-wrapper { max-width: 72rem; }
+.moss-app.v-application .v-overlay__content .v-card { border-radius: 1rem; }
+@media (max-width: 999px), (max-height: 559px) {
+  :root { --moss-sidebar-width: 5rem; }
+  .moss-app.v-application .sidebar { padding-inline: .375rem; }
+  .moss-app.v-application .sidebar > .sidebar__section > .sidebar-item { justify-content: center; padding: .375rem; }
+  .moss-nav-label, .moss-app.v-application .moss-nav-caption, .moss-app.v-application .moss-instance-name { display: none; }
+  .moss-app.v-application .sidebar-instance { justify-content: center; padding: .375rem; }
+  .moss-app.v-application .home-page > .header { padding-top: .75rem; }
+  .moss-app.v-application .home-title { font-size: 1.375rem !important; }
+}
+@media (max-height: 559px) {
+  .moss-app.v-application .sidebar .moss-brand { display: none; }
+  .moss-app.v-application .sidebar > .sidebar__section > .sidebar-item { height: 2.25rem; }
+  .moss-app.v-application .sidebar__divider { margin-block: .25rem; }
+  .moss-app.v-application .sidebar .sidebar-back-btn { height: 1.5rem; margin-bottom: .25rem; }
+  .moss-app.v-application .sidebar__instances { min-height: 2.5rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .moss-app.v-application *, .moss-app.v-application *::before, .moss-app.v-application *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+}
+
+/* Motion follows navigation and actions; backgrounds stay quiet and readable. */
+.moss-page-enter-active { transition: opacity 180ms ease-out, transform 220ms var(--moss-ease-out); }
+.moss-page-leave-active { transition: opacity 100ms ease-in; }
+.moss-page-enter-from { opacity: 0; transform: translateY(8px); }
+.moss-page-leave-to { opacity: 0; }
+.moss-app.v-application .sidebar-item, .moss-app.v-application .sidebar-instance { transition: background-color 150ms ease, color 150ms ease; }
+.moss-app.v-application .sidebar-item__icon { transition: transform 180ms var(--moss-ease-out); }
+.moss-app.v-application .sidebar-item:hover .sidebar-item__icon { transform: translateX(2px); }
+.moss-app.v-application .btn-launch { transition: transform 180ms var(--moss-ease-out), box-shadow 180ms ease; }
+.moss-app.v-application .btn-launch:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 5px 14px color-mix(in srgb, var(--moss-primary) 18%, transparent); }
+.moss-app.v-application .btn-launch:active:not(:disabled) { transform: translateY(0); }

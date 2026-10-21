@@ -6,6 +6,7 @@
     v-context-menu="isFocus ? getFocusBackgroundMenu : undefined"
   >
     <HomeCriticalError />
+    <MossWelcome v-if="isFocus" />
     <transition name="slide-y-reverse-transition" mode="out-in">
       <div v-if="!isFocus" class="mx-3 relative">
         <Transition name="slide-y-reverse-transition">
@@ -45,6 +46,7 @@
   </div>
 </template>
 <script lang="ts" setup>
+import MossWelcome from './MossWelcome.vue'
 import { useDialog } from '@/composables/dialog'
 import { useGlobalDrop } from '@/composables/dropHandler'
 import { kInstance } from '@/composables/instance'

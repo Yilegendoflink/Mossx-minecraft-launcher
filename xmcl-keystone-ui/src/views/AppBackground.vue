@@ -15,18 +15,7 @@
         playsinline
         :muted="isMuted"
       />
-      <Particles
-        v-else-if="backgroundType === BackgroundType.PARTICLE"
-        color="#dedede"
-        class="absolute z-0 h-full w-full"
-        :style="{ filter: `blur(${blur}px)` }"
-        :click-mode="particleMode"
-      />
-      <Halo
-        v-else-if="backgroundType === BackgroundType.HALO"
-        class="absolute z-0 h-full w-full"
-        :style="{ filter: `blur(${blur}px)` }"
-      />
+      <MossAmbientBackground v-else-if="isMossMotion" />
       <img
         v-else-if="backgroundImage?.type === 'image' && backgroundType === BackgroundType.IMAGE"
         :key="backgroundImage.url"
@@ -52,7 +41,7 @@
       name="fade-transition"
     >
       <div
-        v-if="((backgroundColorOverlay && !isHome) || backgroundType === BackgroundType.NONE) && !customBackgroundVideo"
+        v-if="((backgroundColorOverlay && !isHome && !isMossMotion) || backgroundType === BackgroundType.NONE) && !customBackgroundVideo"
         class="z-3 absolute h-full w-full"
         :style="{ 'background': backgroundColor }"
       />
@@ -60,8 +49,7 @@
   </div>
 </template>
 <script lang="ts" setup>
-import Halo from '@/components/Halo.vue'
-import Particles from '@/components/Particles.vue'
+import MossAmbientBackground from '@/components/MossAmbientBackground.vue'
 import { injection } from '@/util/inject'
 import { kTheme, BackgroundType } from '@/composables/theme'
 import { kInstanceLaunch } from '@/composables/instanceLaunch'
@@ -71,7 +59,9 @@ import { inject } from 'vue'
 const customCss = inject(kCustomCss)
 const customBackgroundVideo = computed(() => customCss?.customBackgroundVideo.value || '')
 
-const { sideBarColor, backgroundColorOverlay, backgroundColor, blur, backgroundImage, backgroundType, particleMode, backgroundImageFit, volume } = injection(kTheme)
+const { sideBarColor, backgroundColorOverlay, backgroundColor, blur, backgroundImage, backgroundType, backgroundImageFit, volume } = injection(kTheme)
+// Accept legacy values as well, including old localStorage/instance themes.
+const isMossMotion = computed(() => [BackgroundType.MOSS, BackgroundType.HALO, BackgroundType.PARTICLE].includes(backgroundType.value))
 const videoRef = ref(null as null | HTMLVideoElement)
 const isMuted = computed(() => volume.value <= 0)
 

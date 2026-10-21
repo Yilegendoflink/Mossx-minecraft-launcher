@@ -17,6 +17,7 @@ export enum ParticleMode {
   BUBBLE = 'bubble' }
 
 export enum BackgroundType {
+  MOSS = 'moss',
   NONE = 'none',
   PARTICLE = 'particle',
   HALO = 'halo',
@@ -24,6 +25,7 @@ export enum BackgroundType {
   VIDEO = 'video' }
 
 export interface UIThemeDataV1 {
+  mossBiome?: string
   dark: boolean | 'system'
   colors: {
     lightAppBarColor: string
@@ -80,46 +82,46 @@ export interface UIThemeDataV1 {
 
 export function getDefaultTheme(): UIThemeDataV1 {
   return {
-    dark: 'system',
+    dark: false,
     backgroundMusic: [],
     backgroundMusicPlayOrder: 'sequential',
     colors: {
-      lightAppBarColor: '#e0e0e0FF',
-      lightSideBarColor: '#FFFFFFFF',
-      darkAppBarColor: '#111111FF',
-      darkSideBarColor: '#11111166',
-      darkPrimaryColor: '#4caf50',
-      darkBackground: '#121212A5',
-      darkInfoColor: '#2196F3',
-      darkErrorColor: '#FF5252',
-      darkWarningColor: '#FB8C00',
+      lightAppBarColor: '#f6f8f5FF',
+      lightSideBarColor: '#eaf0e8FF',
+      darkAppBarColor: '#17251eFF',
+      darkSideBarColor: '#1c2d24FF',
+      darkPrimaryColor: '#86b796',
+      darkBackground: '#17251eFF',
+      darkInfoColor: '#7fadd5',
+      darkErrorColor: '#ef8d8d',
+      darkWarningColor: '#d6b56c',
 
-      darkSuccessColor: '#4CAF50',
-      darkAccentColor: '#00e676',
-      darkCardColor: '#0c0c0ccc',
-      lightPrimaryColor: '#1976D2',
-      lightBackground: '#FFFFFF',
-      lightInfoColor: '#2196F3',
-      lightErrorColor: '#FF5252',
-      lightWarningColor: '#FB8C00',
-      lightSuccessColor: '#4CAF50',
-      lightAccentColor: '#82B1FF',
-      lightCardColor: '#e0e0e080' },
+      darkSuccessColor: '#86b796',
+      darkAccentColor: '#a3cfb0',
+      darkCardColor: '#20362aFF',
+      lightPrimaryColor: '#254d3c',
+      lightBackground: '#f6f8f5FF',
+      lightInfoColor: '#3978ad',
+      lightErrorColor: '#b23c3c',
+      lightWarningColor: '#986d21',
+      lightSuccessColor: '#34754c',
+      lightAccentColor: '#47775b',
+      lightCardColor: '#FFFFFFFF' },
     backgroundColorOverlay: true,
     backgroundVolume: 1,
     backgroundImage: undefined,
     backgroundImageDark: undefined,
     backgroundImageFit: 'cover',
-    backgroundType: BackgroundType.NONE,
+    backgroundType: BackgroundType.MOSS,
     font: undefined,
     fontSize: 16,
     borderRadiusEnabled: true,
     customCssEnabled: false,
     blur: {
-      background: 3,
-      card: 20,
-      appBar: 3,
-      sideBar: 3 } }
+      background: 0,
+      card: 0,
+      appBar: 0,
+      sideBar: 0 } }
 }
 
 export function useStoredThemes() {
@@ -942,6 +944,11 @@ export function useTheme(
     isDark.value ? colors.value.darkCardColor : (colors.value.lightCardColor ?? ''),
   )
   const font = computed(() => targetTheme.value.font)
+  // A tiny palette hint lets the initial HTML match the last active theme
+  // before Vue and the theme service finish loading.
+  watch([primaryColor, isDark, backgroundColor], ([color, dark, background]) => {
+    try { localStorage.setItem('moss_boot_palette', JSON.stringify({ color, dark, background: background.startsWith('#') ? background.slice(0, 7) : background })) } catch { /* Storage may be unavailable. */ }
+  }, { immediate: true })
   const fontSize = computed(() => targetTheme.value.fontSize ?? 16)
   const borderRadiusEnabled = computed(() => targetTheme.value.borderRadiusEnabled ?? true)
   const customCssEnabled = computed({
@@ -973,6 +980,10 @@ export function useTheme(
     },
     { immediate: true },
   )
+  // Vuetify cards and shared surfaces must follow the selected palette too.
+  watch([cardColor, isDark], ([newColor]) => {
+    framework.themes.value[framework.global.name.value].colors.surface = newColor.startsWith('#') ? newColor.slice(0, 7) : newColor
+  }, { immediate: true })
   watch(
     infoColor,
     (newColor) => {
@@ -1018,7 +1029,7 @@ export function useTheme(
     font-size: ${fontSize.value}px;
   }
   .v-application {
-    font-family: 'custom', 'Roboto', sans-serif;
+    font-family: 'custom', 'Microsoft YaHei UI', 'PingFang SC', 'Segoe UI', sans-serif;
   }
   `,
     ),
@@ -1067,6 +1078,7 @@ export function useTheme(
 
   return {
     suppressed,
+    activeTheme: targetTheme,
     storedThemes,
     isDark,
     dark,

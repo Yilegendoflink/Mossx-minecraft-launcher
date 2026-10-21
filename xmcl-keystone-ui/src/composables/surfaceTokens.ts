@@ -16,19 +16,19 @@ import { InjectionKey, Ref, ref, watchEffect } from 'vue'
 // ── Defaults ──────────────────────────────────────────────────────────
 
 /** Border radius (px). Matches Vuetify's `rounded="xl"`. */
-export const DEFAULT_SURFACE_RADIUS = 16
+export const DEFAULT_SURFACE_RADIUS = 12
 /** Dialog shell radius (px). Keeps legacy 32px look at factor=1. */
-export const DEFAULT_SURFACE_DIALOG_RADIUS = 32
+export const DEFAULT_SURFACE_DIALOG_RADIUS = 16
 
 /** Vuetify `rounded` prop value equivalent to `DEFAULT_SURFACE_RADIUS`. */
 export const DEFAULT_SURFACE_RADIUS_PROP = 'xl' as const
 
 export const DEFAULT_SURFACE_BORDER = '1px solid rgba(var(--v-theme-on-surface), 0.10)'
-export const DEFAULT_SURFACE_SHADOW = '0 12px 40px -8px rgba(0, 0, 0, 0.35)'
+export const DEFAULT_SURFACE_SHADOW = '0 8px 28px -8px rgba(0, 0, 0, 0.16)'
 
 /** Frosted-glass background shared by dialogs, menus and popovers. */
-export const DEFAULT_SURFACE_BG = 'rgba(var(--v-theme-surface), 0.82)'
-export const DEFAULT_SURFACE_BLUR = 48
+export const DEFAULT_SURFACE_BG = 'rgb(var(--v-theme-surface))'
+export const DEFAULT_SURFACE_BLUR = 0
 
 /** Menu-only: inner padding and list-item radius. */
 export const DEFAULT_SURFACE_MENU_PADDING = 6
@@ -48,7 +48,7 @@ export const DEFAULT_SURFACE_BUTTON_RADIUS = 'lg' as const
 // `.surface-card-subsection`, `.surface-card-item` utility classes
 // (defined in common.css) so existing components that deliberately
 // pick a different radius keep working.
-export const DEFAULT_CARD_RADIUS = 16            // tier 1: HomeCard, SettingCard
+export const DEFAULT_CARD_RADIUS = 12            // tier 1: HomeCard, SettingCard
 export const DEFAULT_CARD_SUBSECTION_RADIUS = 12 // tier 2: nested sections
 export const DEFAULT_CARD_ITEM_RADIUS = 10       // tier 3: list / compact tiles
 
@@ -69,13 +69,13 @@ export const DEFAULT_CARD_ROW_BG = 'rgb(var(--v-theme-surface))'
 export const DEFAULT_CARD_ROW_BORDER = '1px solid rgba(var(--v-theme-on-surface), 0.08)'
 export const DEFAULT_CARD_ROW_BORDER_HOVER = '1px solid rgba(var(--v-theme-primary), 0.45)'
 /** Scale applied while the row is being pressed (1 = none). */
-export const DEFAULT_CARD_ROW_ACTIVE_SCALE = 0.98
+export const DEFAULT_CARD_ROW_ACTIVE_SCALE = 1
 export const DEFAULT_CARD_ROW_TRANSITION = 'border-color 0.2s ease, background-color 0.15s ease, transform 0.1s ease'
 
 /** Default card background — `transparent` lets Vuetify's surface color show through. */
 export const DEFAULT_CARD_BG = 'transparent'
 /** Default card border — most cards in the codebase have none. */
-export const DEFAULT_CARD_BORDER = 'none'
+export const DEFAULT_CARD_BORDER = '1px solid rgba(var(--v-theme-on-surface), 0.10)'
 
 // Info / frosted panels — the recurring "rounded-2xl border border-white/10
 // bg-white/5" pattern used inside dialogs (Feedback / Export / Friends).

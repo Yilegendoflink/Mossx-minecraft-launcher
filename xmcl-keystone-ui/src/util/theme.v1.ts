@@ -58,6 +58,7 @@ export function serialize(theme: UIThemeDataV1) {
     settings.customCssEnabled = true
   }
   settings.dark = theme.dark
+  if (theme.mossBiome) settings.mossBiome = theme.mossBiome
   const serialized: ThemeData = {
     ui: 'keystone',
     version: 1,
@@ -71,6 +72,7 @@ export function serialize(theme: UIThemeDataV1) {
 export function deserialize(data: ThemeData): UIThemeDataV1 {
   const defaultColors = getDefaultTheme().colors
   const theme: UIThemeDataV1 = {
+    mossBiome: typeof data.settings?.mossBiome === 'string' ? data.settings.mossBiome : undefined,
     dark: data.settings?.dark === 'system' ? 'system' : !!(data.settings?.dark),
     colors: {
       lightAppBarColor: data.colors?.lightAppBarColor ?? defaultColors.lightAppBarColor,
@@ -133,7 +135,9 @@ export function deserialize(data: ThemeData): UIThemeDataV1 {
       theme.borderRadiusEnabled = Number(data.settings.borderRadiusScale) > 0
     }
     if (data.settings.backgroundType) {
-      theme.backgroundType = data.settings.backgroundType as any
+      const type = data.settings.backgroundType
+      theme.backgroundType = type === BackgroundType.HALO || type === BackgroundType.PARTICLE
+        ? BackgroundType.MOSS : type as BackgroundType
     }
     if (data.settings.backgroundImageFit) {
       theme.backgroundImageFit = data.settings.backgroundImageFit as any
