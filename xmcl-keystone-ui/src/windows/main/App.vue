@@ -1,21 +1,24 @@
 <template>
-  <v-app v-if="!showSetup" class="h-full max-h-screen overflow-hidden select-none" :class="{ 'dark': isDark }">
+  <v-app v-if="!showSetup" class="moss-app h-full max-h-screen overflow-hidden select-none" :class="{ 'dark': isDark }">
     <AppBackground />
     <div v-if="!isBigPicture" class="w-full h-full absolute left-0 header-overlay" :style="{
       height: headerHeight + 70 + 'px',
       'background-image': `linear-gradient(${appBarColor} 0%, color-mix(in srgb, ${appBarColor}, transparent) 65%, transparent 100%)`
     }">
     </div>
-    <AppSystemBar v-if="!isBigPicture" :back="sidebarStyle === 'notch'" />
+    <AppSystemBar v-if="!isBigPicture" :back="sidebarStyle === 'notch'">
+      <MossNavigationMenu />
+      <span class="moss-window-title">MOSS X</span>
+    </AppSystemBar>
     <div
       class="app-layout flex-grow relative flex overflow-auto"
       :class="[layoutClasses, { 'workspace-side-panel-attached': hasAttachedWorkspacePanel }]"
     >
       <AppSideBarClassic v-if="sidebarStyle === 'classic'" />
       <AppSideBarNotch v-else />
-      <main class="relative flex max-h-full flex-1 flex-col overflow-auto" :class="mainClasses">
+      <main class="moss-main-content relative flex max-h-full flex-1 flex-col overflow-auto" :class="mainClasses">
         <router-view v-slot="{ Component }">
-          <transition name="fade-transition" mode="out-in">
+          <transition name="moss-page" mode="out-in">
             <component :is="Component" class="z-2" />
           </transition>
         </router-view>
@@ -38,7 +41,7 @@
       <AppBigPictureView v-if="isBigPicture" />
     </transition>
   </v-app>
-  <v-app v-else class="h-full max-h-screen overflow-hidden" :class="{ 'dark': isDark }">
+  <v-app v-else class="moss-app h-full max-h-screen overflow-hidden" :class="{ 'dark': isDark }">
     <AppSystemBar no-user no-task />
     <div class="app-layout relative flex min-h-0 flex-1 overflow-hidden">
       <Setup @ready="onReady" />
@@ -51,8 +54,10 @@
 
 <script lang=ts setup>
 import '@/assets/common.css'
+import '@/assets/moss.css'
 import AppImageDialog from '@/components/AppImageDialog.vue'
 import AppSharedTooltip from '@/components/AppSharedTooltip.vue'
+import MossNavigationMenu from '@/components/MossNavigationMenu.vue'
 import { useAuthProfileImportNotification } from '@/composables/authProfileImport'
 import { useAgentChatHotkey } from '@/composables/agentChat'
 import { kAgent, installAgentDevLauncher, useAgent } from '@/composables/agent'

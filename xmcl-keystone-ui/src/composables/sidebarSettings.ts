@@ -1,4 +1,4 @@
-import { InjectionKey, Ref } from 'vue'
+import { InjectionKey, Ref, watch } from 'vue'
 import { useLocalStorage } from '@vueuse/core'
 import { injection } from '@/util/inject'
 
@@ -23,9 +23,16 @@ export function useSidebarSettings(): SidebarSettings {
   const style = useLocalStorage<SidebarStyle>('sidebar_style', 'classic', { writeDefaults: false })
   const align = useLocalStorage<SidebarAlign>('sidebar_align', 'center', { writeDefaults: false })
   const scale = useLocalStorage('sidebar_scale', 100, { writeDefaults: false })
-  const autoHide = useLocalStorage('sidebar_autoHide', true, { writeDefaults: false })
+  const autoHide = useLocalStorage('sidebar_autoHide', false, { writeDefaults: false })
   const showOnlyPinned = useLocalStorage('sidebar_showOnlyPinned', false, { writeDefaults: false })
   const pinnedInstances = useLocalStorage<string[]>('sidebar_pinnedInstances', [])
+
+  // Classic navigation supports vertical positions, including restored settings.
+  watch([style, position], ([currentStyle, currentPosition]) => {
+    if (currentStyle === 'classic' && (currentPosition === 'top' || currentPosition === 'bottom')) {
+      position.value = 'left'
+    }
+  }, { immediate: true })
 
   return {
     position,

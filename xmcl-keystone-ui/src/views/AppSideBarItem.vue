@@ -25,11 +25,13 @@
         </v-icon>
       </slot>
     </span>
+    <span v-if="label" class="moss-nav-label" aria-hidden="true">{{ label }}</span>
   </component>
 </template>
 
 <script lang="ts" setup>
 const props = defineProps<{
+  label?: string
   id?: string
   to?: string
   icon?: string

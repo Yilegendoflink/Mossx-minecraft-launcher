@@ -355,6 +355,7 @@ const sidebarStyleIndex = computed({
   get: () => sidebarStyles.indexOf(sidebarStyle.value),
   set: (v) => {
     sidebarStyle.value = sidebarStyles[v]
+    sidebarAutoHide.value = false
   },
 })
 

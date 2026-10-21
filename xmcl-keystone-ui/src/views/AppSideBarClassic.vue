@@ -8,6 +8,8 @@
     class="sidebar moveable z-10"
     :style="{ 'backdrop-filter': `blur(${blurSidebar}px)`, backgroundColor: sideBarColor }"
   >
+    <MossBrand />
+    <span class="moss-nav-caption">{{ t('moss.workspace') }}</span>
     <div v-roving-tabindex role="group" class="sidebar__section">
       <button
         v-shared-tooltip.right="() => t('shared.back')"
@@ -21,9 +23,12 @@
         </v-icon>
       </button>
 
+      <AppSideBarItem to="/" icon="sports_esports" :label="t('moss.play')" :aria-label="t('moss.play')" />
+      <AppSideBarItem clickable icon="download" :label="t('moss.downloads')" :aria-label="t('moss.downloads')" @click="showTasks()" />
       <AppSideBarItem
         id="my-stuff-button"
         data-testid="nav-accounts"
+        :label="t('moss.library')"
         v-shared-tooltip.right="() => t('myStuff')"
         to="/me"
         :aria-label="myStuffAriaLabel"
@@ -37,6 +42,7 @@
 
       <AppSideBarItem
         data-testid="nav-store"
+        :label="t('moss.discover')"
         v-shared-tooltip.right="() => t('store.name', 2)"
         to="/store"
         :aria-label="storeAriaLabel"
@@ -48,6 +54,7 @@
 
       <AppSideBarItem
         data-testid="nav-agent"
+        :label="t('agent.title')"
         v-shared-tooltip.right="agentTooltip"
         clickable
         :aria-label="agentAriaLabel"
@@ -93,6 +100,7 @@
     <div v-roving-tabindex role="group" class="sidebar__section">
       <AppSideBarItem
         data-testid="nav-multiplayer"
+        :label="t('multiplayer.togetherName')"
         v-shared-tooltip.right="() => t('multiplayer.togetherName')"
         clickable
         :active="isMultiplayerActive"
@@ -106,6 +114,7 @@
 
       <AppSideBarItem
         data-testid="nav-settings"
+        :label="t('setting.name', 2)"
         v-shared-tooltip.right="() => t('setting.name', 2)"
         to="/setting"
         :aria-label="settingsAriaLabel"
@@ -247,6 +256,8 @@
 
 <script lang="ts" setup>
 import PlayerAvatar from '@/components/PlayerAvatar.vue'
+import MossBrand from '@/components/MossBrand.vue'
+import { useDialog } from '@/composables/dialog'
 import { useAgentChatEntry, useAgentChatStatus } from '@/composables/agentChat'
 import { useDragAutoScroll } from '@/composables/dragAutoScroll'
 import { kMultiplayerEntry } from '@/composables/multiplayerEntry'
@@ -274,6 +285,7 @@ const agentRunningInBackground = computed(() => agentChatStatus.running.value &&
 const agentConfirmationPending = agentChatStatus.confirmationPending
 
 const { t } = useI18n()
+const { show: showTasks } = useDialog('task')
 const { back } = useRouter()
 const route = useRoute()
 

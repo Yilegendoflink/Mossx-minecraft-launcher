@@ -50,6 +50,7 @@
           <v-icon :size="14" color="white">play_arrow</v-icon>
         </span>
       </span>
+      <span class="moss-instance-name" aria-hidden="true">{{ name }}</span>
     </div>
     <!-- Pin indicator -->
     <div

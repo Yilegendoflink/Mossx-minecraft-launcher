@@ -2,16 +2,24 @@
   <div
     ref="wrapper"
     data-testid="app-sidebar"
+    role="navigation"
+    :aria-label="t('moss.navigation.title')"
     class="sidebar-notch-wrapper"
     :class="wrapperClasses"
     @mouseenter="onMouseEnter"
     @mouseleave="onMouseLeave"
+    @focusin="hasKeyboardFocus = true; onMouseEnter()"
+    @focusout="onFocusOut"
   >
     <!-- Trigger zone for detecting hover when sidebar is hidden -->
-    <div
+    <button
       v-if="autoHide"
+      type="button"
+      data-testid="sidebar-reveal"
+      :aria-label="t('moss.navigation.title')"
       class="sidebar-trigger"
       :class="triggerClasses"
+      @click="onMouseEnter"
     />
     
     <div
@@ -182,13 +190,14 @@ const isMultiplayerActive = computed(() => route.path === '/multiplayer')
 
 // Hover state for auto-hide
 const isHovered = ref(false)
+const hasKeyboardFocus = ref(false)
 let hideTimeout: ReturnType<typeof setTimeout> | null = null
 
 const isHorizontal = computed(() => position.value === 'top' || position.value === 'bottom')
 const isVertical = computed(() => position.value === 'left' || position.value === 'right')
 const iconSize = computed(() => isHorizontal.value ? 20 : 22)
 
-const shouldHide = computed(() => autoHide.value && !isHovered.value)
+const shouldHide = computed(() => autoHide.value && !isHovered.value && !hasKeyboardFocus.value)
 
 // Wrapper classes for positioning
 const wrapperClasses = computed(() => ({
@@ -275,13 +284,23 @@ function onMouseEnter() {
   isHovered.value = true
 }
 
-function onMouseLeave(e: MouseEvent) {
+function onMouseLeave() {
   if (!autoHide.value) return
   
   hideTimeout = setTimeout(() => {
     isHovered.value = false
   }, 2500)
 }
+
+function onFocusOut(event: FocusEvent) {
+  if (!(event.currentTarget as HTMLElement).contains(event.relatedTarget as Node | null)) {
+    hasKeyboardFocus.value = false
+    onMouseLeave()
+  }
+}
+onUnmounted(() => {
+  if (hideTimeout) clearTimeout(hideTimeout)
+})
 
 
 function goMultiplayer() {
@@ -363,18 +382,18 @@ const instanceItems = computed(() => {
 
 .sidebar-notch-wrapper.wrapper--auto-hide.wrapper--left {
   left: 0;
-  top: 0; /* Start below window title bar */
+  top: 2.625rem;
   bottom: 0;
 }
 
 .sidebar-notch-wrapper.wrapper--auto-hide.wrapper--right {
   right: 0;
-  top: 0; /* Start below window title bar */
+  top: 2.625rem;
   bottom: 0;
 }
 
 .sidebar-notch-wrapper.wrapper--auto-hide.wrapper--top {
-  top: 24px;
+  top: 2.625rem;
   left: 0;
   right: 0;
   z-index: 102; /* Ensure top sidebar is above window controls if it MUST be there, but might need offset too */
@@ -388,6 +407,10 @@ const instanceItems = computed(() => {
 
 /* Trigger zone - water drop style with hover indicator */
 .sidebar-trigger {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
   position: absolute;
   pointer-events: auto;
   display: flex;
@@ -399,14 +422,14 @@ const instanceItems = computed(() => {
 .sidebar-trigger::after {
   content: '';
   position: absolute;
-  background: rgba(255, 255, 255, 0.2);
+  background: color-mix(in srgb, var(--moss-primary) 45%, transparent);
   box-shadow: 0 0 6px rgba(255, 255, 255, 0.1);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Hover state - grow and glow when wrapper is hovered */
 .wrapper--hovered .sidebar-trigger::after {
-  background: rgba(255, 255, 255, 0.4);
+  background: color-mix(in srgb, var(--moss-primary) 75%, transparent);
   box-shadow: 0 0 12px rgba(255, 255, 255, 0.3);
 }
 
