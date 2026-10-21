@@ -1,0 +1,47 @@
+import { test, expect } from '../../fixtures/packaged'
+import { readFile, writeFile } from 'node:fs/promises'
+import { join } from 'node:path'
+
+test('flat logo follows eight palettes, dark mode and the saved startup palette', async ({ packaged }, testInfo) => {
+  const page = await packaged.app.firstWindow()
+  await page.waitForSelector('[data-testid="app-sidebar"]', { timeout: 30000 })
+  await page.keyboard.press('Escape')
+  const logo = page.getByTestId('moss-brand-icon')
+  await expect(logo).toHaveCSS('width', '32px')
+  await expect(logo).toHaveCSS('mask-image', /moss-x.*\.svg/)
+  await page.getByTestId('nav-settings').click()
+  const picker = page.getByTestId('moss-biome-picker')
+  await picker.scrollIntoViewIfNeeded()
+  const colors = new Set<string>()
+  for (const id of ['forest', 'cherry', 'snow', 'desert', 'ocean', 'swamp', 'nether', 'end']) {
+    await picker.getByTestId('moss-biome-' + id).click()
+    await expect(picker.getByTestId('moss-biome-' + id)).toHaveAttribute('aria-pressed', 'true')
+    const selectedColor = await picker.getByTestId('moss-biome-' + id).evaluate(el => getComputedStyle(el).borderColor)
+    await expect(logo).toHaveCSS('background-color', selectedColor)
+    colors.add(selectedColor)
+    if (id === 'cherry') await page.screenshot({ path: testInfo.outputPath('01-cherry-logo.png') })
+  }
+  expect(colors.size).toBe(8)
+  const themeFile = join(packaged.appDataPath, 'xmcl', 'theme.json')
+  await expect.poll(async () => { try { return JSON.parse(await readFile(themeFile, 'utf8')).settings.mossBiome } catch { return '' } }).toBe('end')
+  const lightColor = await logo.evaluate(el => getComputedStyle(el).backgroundColor)
+  const theme = JSON.parse(await readFile(themeFile, 'utf8'))
+  theme.settings.dark = true
+  await writeFile(themeFile, JSON.stringify(theme))
+  await page.reload()
+  await expect(page.locator('.moss-app')).toHaveClass(/v-theme--dark/)
+  const darkColor = await logo.evaluate(el => getComputedStyle(el).backgroundColor)
+  expect(darkColor).not.toBe(lightColor)
+  await page.getByTestId('nav-settings').click()
+  await page.getByTestId('moss-about').scrollIntoViewIfNeeded()
+  await expect(page.getByTestId('moss-about-icon')).toHaveCSS('width', '40px')
+  await expect(page.getByTestId('moss-about-icon')).toHaveCSS('background-color', darkColor)
+  await page.screenshot({ path: testInfo.outputPath('02-end-dark-logo.png') })
+  const background = await page.locator('body').evaluate(el => getComputedStyle(el).backgroundColor)
+  const startup = await page.evaluate(async () => (await fetch('http://xmcl.runtime/index.html')).text())
+  await page.setContent(startup.replace(/<script\b[^>]*type="module"[^>]*>[\s\S]*?<\/script>/gi, ''), { waitUntil: 'load' })
+  await expect(page.getByTestId('moss-loading-icon')).toHaveCSS('width', '64px')
+  await expect(page.getByTestId('moss-loading-icon')).toHaveCSS('background-color', darkColor)
+  await expect(page.locator('body')).toHaveCSS('background-color', background)
+  await page.screenshot({ path: testInfo.outputPath('03-themed-startup.png') })
+})

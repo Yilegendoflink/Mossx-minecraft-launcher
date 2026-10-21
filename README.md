@@ -1,3 +1,17 @@
+# MOSS X
+
+**X-Launcher个人美化版本**，基于 X Minecraft Launcher（XMCL）0.72.0，保留原作者 ci010、贡献者和开源许可。
+
+- [MOSS X 构建与使用说明](README.Moss.md)
+- [0.72.0-moss.1 发行说明](RELEASE_NOTES.Moss.md)
+- [原项目](https://github.com/voxelum/x-minecraft-launcher)
+
+包含群系主题、主题图标、中文社区目录与统一来源筛选。Windows 发行包使用独立配置目录和 MOSS X 手动更新渠道。
+
+以下保留原项目介绍与相关信息。
+
+---
+
 <p align="center">
   <a href="https://xmcl.app" target="_blank">
     <img alt="Logo" width="100" src="https://github.com/Voxelum/x-minecraft-launcher/blob/master/xmcl-electron-app/icons/dark@256x256.png">

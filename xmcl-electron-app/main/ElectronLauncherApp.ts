@@ -4,7 +4,7 @@ import { LAUNCHER_NAME } from '@xmcl/runtime/constant'
 import { kFlights, runWithExternalHttpTrace } from '@xmcl/runtime/infra'
 import { AnyError } from '@xmcl/utils'
 import { Menu, app, net, shell } from 'electron'
-import { stat } from 'fs-extra'
+import { ensureDirSync, stat } from 'fs-extra'
 import { join } from 'path'
 import { fetch as ufetch, FormData as UndiciFormData } from 'undici'
 import { ElectronController } from './ElectronController'
@@ -17,6 +17,7 @@ import { isReplayableFetchBody, splitFetchBody } from './fetchBody'
 import { getOzonePlatform } from './ozonePlatform'
 import { ElectronUpdater } from './utils/updater'
 import { getWindowsUtils } from './utils/windowsUtils'
+import { getMossProfileRoot } from './utils/mossDistribution'
 
 class ElectronShell implements Shell {
   showItemInFolder = shell.showItemInFolder
@@ -154,17 +155,13 @@ export default class ElectronLauncherApp extends LauncherApp {
   private readonly reportedNonLatin1Headers = new Set<string>()
 
   constructor() {
-    // E2E hook: when XMCL_E2E_APP_DATA is set, redirect Electron's appData
-    // (and therefore both `app.getPath('appData')` calls below + the one in
-    // xmcl-runtime/app/LauncherApp.ts) to a per-test temporary directory.
-    // This isolates every Playwright spec on a clean launcher root.
-    if (process.env.XMCL_E2E_APP_DATA) {
-      try {
-        app.setPath('appData', process.env.XMCL_E2E_APP_DATA)
-        app.setPath('userData', join(process.env.XMCL_E2E_APP_DATA, LAUNCHER_NAME))
-      } catch {
-        // Electron may reject if app is already ready; fall back silently.
-      }
+    // Keep MOSS distributions separate from XMCL. Explicit workspace/E2E
+    // overrides still win. A failed override must not fall back to user data.
+    const profileRoot = getMossProfileRoot(app.getName(), app.getPath('appData'), process.env.XMCL_E2E_APP_DATA)
+    if (profileRoot) {
+      ensureDirSync(join(profileRoot, LAUNCHER_NAME))
+      app.setPath('appData', profileRoot)
+      app.setPath('userData', join(profileRoot, LAUNCHER_NAME))
     }
     super(app as any,
       new ElectronShell(),

@@ -32,6 +32,7 @@ import { kSettings } from '~/settings'
 import { checksum } from '~/util/fs'
 import ElectronLauncherApp from '../ElectronLauncherApp'
 import { ensureElevateExe } from './elevate'
+import { assertMossUpdateAllowed, getMossUpdateInfo } from './mossDistribution'
 
 const kPatched = Symbol('Patched')
 
@@ -480,6 +481,8 @@ export class ElectronUpdater implements LauncherAppUpdater {
   }
 
   async checkUpdateTask(): Promise<ReleaseInfo> {
+    const mossInfo = getMossUpdateInfo(app.getName(), app.getVersion())
+    if (mossInfo) return mossInfo
     if (this.app.platform.os === 'windows' || this.app.platform.os === 'osx') {
       return this.#getUpdateFromSelfHost()
     }
@@ -495,6 +498,7 @@ export class ElectronUpdater implements LauncherAppUpdater {
   }
 
   async downloadUpdate(updateInfo: ReleaseInfo, options?: DownloadUpdateOptions): Promise<void> {
+    assertMossUpdateAllowed(app.getName())
     const tracker = options?.tracker
     const abortSignal = options?.abortSignal
 
@@ -521,6 +525,7 @@ export class ElectronUpdater implements LauncherAppUpdater {
   }
 
   async installUpdateAndQuit(updateInfo: ReleaseInfo): Promise<void> {
+    assertMossUpdateAllowed(app.getName())
     if (HAS_DEV_SERVER) {
       this.logger.log('Currently is development environment. Skip to install update')
       return

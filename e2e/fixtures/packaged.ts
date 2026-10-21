@@ -21,7 +21,7 @@ import { _electron, ElectronApplication, test as base } from '@playwright/test'
 import { existsSync } from 'node:fs'
 import { cp, mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
-import { dirname, extname, join, resolve } from 'node:path'
+import { basename, dirname, extname, join, resolve, sep } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
@@ -35,6 +35,7 @@ const OUTPUT_ROOT = resolve(REPO_ROOT, 'xmcl-electron-app/build/output')
  * runner arch and fall back to whatever exists.
  */
 function findPackagedBinary(): string {
+  if (process.env.XMCL_E2E_PACKAGED_EXECUTABLE) return resolve(process.env.XMCL_E2E_PACKAGED_EXECUTABLE)
   const productName = 'XMCL'
   if (process.platform === 'win32') {
     return join(OUTPUT_ROOT, 'win-unpacked', `${productName}.exe`)
@@ -176,7 +177,21 @@ export const test = base.extend<{ packaged: PackagedFixture }>({
             path,
           })
         }],
-        ['close Electron', async () => { await app?.close() }],
+        ['close Electron', async () => {
+          if (process.env.XMCL_E2E_PACKAGED_EXECUTABLE) {
+            // The custom artifact test owns this temporary profile; stop background workers before removing it.
+            const child = app?.process()
+            await app?.evaluate(({ app }) => app.exit(0)).catch(() => {})
+            if (child && child.exitCode === null && child.signalCode === null) {
+              await new Promise<void>((done, reject) => {
+                const timer = setTimeout(() => reject(new Error('Custom packaged app did not exit')), 5000)
+                child.once('exit', () => { clearTimeout(timer); done() })
+              })
+            }
+          } else {
+            await app?.close()
+          }
+        }],
         ['preserve launcher logs', async () => {
           if (existsSync(logRoot)) {
             await cp(logRoot, testInfo.outputPath('launcher-logs'), {
@@ -194,7 +209,10 @@ export const test = base.extend<{ packaged: PackagedFixture }>({
           })
         }],
         ['remove isolated profile', async () => {
-          await rm(tempRoot, { recursive: true, force: true })
+          if (!resolve(tempRoot).startsWith(resolve(tmpdir()) + sep) || !basename(tempRoot).startsWith('xmcl-e2e-pkg-')) {
+            throw new Error('Refusing to remove a profile outside the owned test directory')
+          }
+          await rm(tempRoot, { recursive: true, force: true, maxRetries: 10, retryDelay: 200 })
         }],
       ]
       for (const [name, run] of steps) {

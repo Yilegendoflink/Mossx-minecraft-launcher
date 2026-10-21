@@ -34,3 +34,20 @@ e2e/test-results/
 
 # local download-probe / benchmark artifacts (opt-in tests)
 /bench-out/
+
+# Isolated Moss development data
+.moss-local/
+
+# Locally packaged Moss applications
+/xmcl-electron-app/build/moss-output/
+/xmcl-electron-app/build/moss-deployment/
+/xmcl-electron-app/build/moss-biomes/
+/xmcl-electron-app/build/moss-motion/
+/xmcl-electron-app/build/moss-navigation/
+/xmcl-electron-app/build/moss-x/
+/xmcl-electron-app/build/moss-catalog/
+/xmcl-electron-app/build/moss-sources/
+/xmcl-electron-app/build/moss-branding/
+/xmcl-electron-app/build/moss-flat/
+/xmcl-electron-app/build/moss-release/
+/.hallmark/
